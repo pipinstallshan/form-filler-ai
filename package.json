@@ -1,0 +1,22 @@
+{
+  "name": "form-filler-ai",
+  "version": "1.0.0",
+  "description": "AI-powered form detection and filling service",
+  "type": "commonjs",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/test.ts",
+    "start": "tsx src/test.ts",
+    "test": "tsx src/test.ts"
+  },
+  "dependencies": {
+    "playwright": "^1.49.1",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
