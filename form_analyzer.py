@@ -1,17 +1,11 @@
-"""
-AI-First Form Analyzer
-Extracts HTML and uses AI to identify form fields
-"""
-
 import re
 from typing import Dict, List, Any
 from dataclasses import dataclass
 from bs4 import BeautifulSoup
-
+from page_processor import expand_all_dropdowns, dedupe_html, save_all_dropdowns_in_one_html
 
 @dataclass
 class JobProfile:
-    """Job application profile data"""
     firstName: str
     lastName: str
     email: str
@@ -46,37 +40,17 @@ class JobProfile:
     disabilityStatus: str = None
     race: str = None
 
-
 def extract_clean_html(driver) -> str:
-    """Extract body HTML and remove unnecessary tags"""
-    print('📄 Extracting page HTML...')
-    
-    # Get the full page HTML
-    html = driver.page_source
-    
-    # Parse with BeautifulSoup
-    soup = BeautifulSoup(html, 'html.parser')
-    
-    # Remove unnecessary tags
-    for tag in soup(['script', 'style', 'noscript', 'svg', 'path', 'iframe', 'img']):
-        tag.decompose()
-    
-    # Get body only
-    body = soup.find('body')
-    if not body:
-        body = soup
-    
-    # Clean up whitespace
-    clean_html = str(body)
-    clean_html = re.sub(r'\s+', ' ', clean_html)
-    clean_html = re.sub(r'>\s+<', '><', clean_html)
-    
+    print('📄 Extracting page HTML with dropdown expansion...')
+    html_snapshots, dropdown_names = expand_all_dropdowns(driver)
+    print(f'   📊 Collected {len(html_snapshots)} HTML snapshot(s) ({len(dropdown_names)} dropdown(s) expanded)')
+    merged_soup = save_all_dropdowns_in_one_html(html_snapshots, dropdown_names)
+    merged_dedupe_soup = dedupe_html(merged_soup)
+    clean_html = str(merged_dedupe_soup)
     print(f'✅ Extracted {len(clean_html)} characters of HTML')
     return clean_html
 
-
 def get_profile_as_dict(profile: JobProfile) -> Dict[str, Any]:
-    """Convert profile to dictionary for AI"""
     return {
         'firstName': profile.firstName,
         'lastName': profile.lastName,
